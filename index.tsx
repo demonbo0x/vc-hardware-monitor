@@ -1,60 +1,51 @@
-// استخدام الـ Globals مباشرة عشان نتخطى مشاكل الـ Import
-const { definePlugin } = Vencord.Plugins;
-const { React } = Vencord.Webpack.Common;
-const { after } = Vencord.Patcher;
-const { findByName } = Vencord.Webpack;
-
-function HardwareWidget() {
-    const [memory, setMemory] = React.useState("0 MB");
-
-    React.useEffect(() => {
-        const updateMem = () => {
-            try {
-                const perfMemory = (window.performance as any).memory;
-                if (perfMemory) {
-                    const usedMB = (perfMemory.usedJSHeapSize / 1024 / 1024).toFixed(1);
-                    setMemory(`RAM: ${usedMB} MB`);
-                }
-            } catch (e) {
-                setMemory("RAM: N/A");
-            }
-        };
-        updateMem();
-        const interval = setInterval(updateMem, 2000);
-        return () => clearInterval(interval);
-    }, []);
-
-    return React.createElement("div", {
-        style: {
-            display: "flex",
-            alignItems: "center",
-            padding: "2px 8px",
-            margin: "0 8px",
-            borderRadius: "4px",
-            backgroundColor: "var(--background-modifier-accent)",
-            color: "var(--text-normal)",
-            fontSize: "12px",
-            fontFamily: "monospace",
-            fontWeight: "bold",
-            cursor: "default"
-        }
-    }, "🖥️ " + memory);
-}
+import definePlugin from "@utils/types";
 
 export default definePlugin({
-    name: "Hardware Monitor",
-    description: "مراقب أداء الجهاز (يعرض استهلاك الرامات المباشر)",
-    authors: [{ name: "DemonBo0x", id: "000000000000" }],
-    
+    name: "hardwareMonitor",
+    description: "Shows RAM usage near the Discord account panel",
+    authors: [{ name: "DemonBo0x", id: 0n }],
+
+    interval: null as ReturnType<typeof setInterval> | null,
+    element: null as HTMLDivElement | null,
+
     start() {
-        const Account = findByName("Account");
-        if (Account) {
-            after("default", Account, (args, res) => {
-                if (res?.props?.children && Array.isArray(res.props.children)) {
-                    res.props.children.unshift(React.createElement(HardwareWidget));
-                }
-            });
-        }
+        const el = document.createElement("div");
+        el.id = "vc-hw-monitor";
+        Object.assign(el.style, {
+            position: "fixed",
+            bottom: "8px",
+            left: "72px",
+            zIndex: "999",
+            padding: "2px 8px",
+            borderRadius: "4px",
+            background: "var(--background-floating, #18191c)",
+            color: "var(--text-normal, #dcddde)",
+            fontSize: "11px",
+            fontFamily: "monospace",
+            fontWeight: "bold",
+            pointerEvents: "none",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.4)"
+        });
+        document.body.appendChild(el);
+        this.element = el;
+
+        const update = () => {
+            try {
+                const perf = (window.performance as any).memory;
+                el.textContent = perf
+                    ? `🖥️ RAM: ${(perf.usedJSHeapSize / 1024 / 1024).toFixed(1)} MB`
+                    : "🖥️ RAM: N/A";
+            } catch {
+                el.textContent = "🖥️ RAM: N/A";
+            }
+        };
+
+        update();
+        this.interval = setInterval(update, 2000);
     },
-    stop() {}
+
+    stop() {
+        if (this.interval) clearInterval(this.interval);
+        this.element?.remove();
+    }
 });
