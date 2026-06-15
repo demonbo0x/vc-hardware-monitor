@@ -1,7 +1,8 @@
-import { definePlugin } from "vencord/plugins";
-import { React } from "vencord/webpack/common";
-import { after } from "vencord/patcher";
-import { findByName } from "vencord/webpack";
+// استخدام الـ Globals مباشرة عشان نتخطى مشاكل الـ Import
+const { definePlugin } = Vencord.Plugins;
+const { React } = Vencord.Webpack.Common;
+const { after } = Vencord.Patcher;
+const { findByName } = Vencord.Webpack;
 
 function HardwareWidget() {
     const [memory, setMemory] = React.useState("0 MB");
@@ -18,14 +19,13 @@ function HardwareWidget() {
                 setMemory("RAM: N/A");
             }
         };
-
         updateMem();
         const interval = setInterval(updateMem, 2000);
         return () => clearInterval(interval);
     }, []);
 
-    return (
-        <div style={{
+    return React.createElement("div", {
+        style: {
             display: "flex",
             alignItems: "center",
             padding: "2px 8px",
@@ -37,10 +37,8 @@ function HardwareWidget() {
             fontFamily: "monospace",
             fontWeight: "bold",
             cursor: "default"
-        }}>
-            🖥️ {memory}
-        </div>
-    );
+        }
+    }, "🖥️ " + memory);
 }
 
 export default definePlugin({
@@ -58,6 +56,5 @@ export default definePlugin({
             });
         }
     },
-    
     stop() {}
 });
