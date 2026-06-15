@@ -1,4 +1,4 @@
-import definePlugin from "@utils/types";
+import { definePlugin } from "@utils/types";
 import { React } from "@webpack/common";
 import { after } from "@lib/patcher";
 import { findByName } from "@webpack";
@@ -58,6 +58,6 @@ export default definePlugin({
             });
         }
     },
-
+    
     stop() {}
 });
