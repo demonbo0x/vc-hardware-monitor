@@ -1,8 +1,7 @@
-// هذا الكود لا يحتاج إلى أي Imports خارجية ويتعامل مع ديسكورد مباشرة
-const { definePlugin } = Vencord.Plugins;
-const { React } = Vencord.Webpack.Common;
-const { after } = Vencord.Patcher;
-const { findByName } = Vencord.Webpack;
+import { definePlugin } from "@utils/types";
+import { React } from "@webpack/common";
+import { after } from "@lib/patcher";
+import { findByProps } from "@webpack";
 
 function HardwareWidget() {
     const [memory, setMemory] = React.useState("0 MB");
@@ -10,7 +9,6 @@ function HardwareWidget() {
     React.useEffect(() => {
         const updateMem = () => {
             try {
-                // الوصول المباشر لذاكرة الجهاز
                 const perfMemory = (window.performance as any).memory;
                 if (perfMemory) {
                     const usedMB = (perfMemory.usedJSHeapSize / 1024 / 1024).toFixed(1);
@@ -44,11 +42,11 @@ function HardwareWidget() {
 
 export default definePlugin({
     name: "Hardware Monitor",
-    description: "مراقب أداء الجهاز (استهلاك الرامات)",
+    description: "مراقب أداء الجهاز (يعرض استهلاك الرامات المباشر)",
     authors: [{ name: "DemonBo0x", id: "000000000000" }],
     
     start() {
-        const Account = findByName("Account");
+        const Account = findByProps("Account");
         if (Account) {
             after("default", Account, (args, res) => {
                 if (res?.props?.children && Array.isArray(res.props.children)) {
