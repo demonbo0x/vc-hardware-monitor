@@ -5,8 +5,8 @@ export default definePlugin({
     description: "Shows RAM usage near the Discord account panel",
     authors: [{ name: "DemonBo0x", id: 0n }],
 
-    interval: null as ReturnType<typeof setInterval> | null,
-    element: null as HTMLDivElement | null,
+    _interval: null as ReturnType<typeof setInterval> | null,
+    _element: null as HTMLDivElement | null,
 
     start() {
         const el = document.createElement("div");
@@ -16,7 +16,7 @@ export default definePlugin({
             bottom: "8px",
             left: "72px",
             zIndex: "999",
-            padding: "2px 8px",
+            padding: "2px 10px",
             borderRadius: "4px",
             background: "var(--background-floating, #18191c)",
             color: "var(--text-normal, #dcddde)",
@@ -27,7 +27,7 @@ export default definePlugin({
             boxShadow: "0 1px 4px rgba(0,0,0,0.4)"
         });
         document.body.appendChild(el);
-        this.element = el;
+        this._element = el;
 
         const update = () => {
             try {
@@ -41,11 +41,12 @@ export default definePlugin({
         };
 
         update();
-        this.interval = setInterval(update, 2000);
+        this._interval = setInterval(update, 2000);
     },
 
     stop() {
-        if (this.interval) clearInterval(this.interval);
-        this.element?.remove();
+        if (this._interval) clearInterval(this._interval);
+        this._element?.remove();
+        this._element = null;
     }
 });
