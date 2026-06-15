@@ -1,7 +1,7 @@
-import { definePlugin } from "@utils/types";
-import { React } from "@webpack/common";
-import { after } from "@lib/patcher";
-import { findByName } from "@webpack";
+import { definePlugin } from "vencord/plugins";
+import { React } from "vencord/webpack/common";
+import { after } from "vencord/patcher";
+import { findByName } from "vencord/webpack";
 
 function HardwareWidget() {
     const [memory, setMemory] = React.useState("0 MB");
@@ -46,7 +46,7 @@ function HardwareWidget() {
 export default definePlugin({
     name: "Hardware Monitor",
     description: "مراقب أداء الجهاز (يعرض استهلاك الرامات المباشر)",
-    authors: [{ name: "YourName", id: "000000000000" }],
+    authors: [{ name: "DemonBo0x", id: "000000000000" }],
     
     start() {
         const Account = findByName("Account");
